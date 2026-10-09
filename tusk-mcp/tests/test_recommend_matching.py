@@ -6,6 +6,26 @@ from tests.conftest import login
 from tests.mcp_client import call_tool
 
 
+def test_category_beats_a_word_in_someone_elses_about(client: TestClient) -> None:
+    for name, category, about, service in [
+        ("Oak Furniture Works", "Woodwork & Furniture", "Tables, beds and wardrobes made to order.", "Dining table"),
+        ("Flow Plumbing", "Plumbing", "Plumbers for homes and new buildings.", "Leak repair"),
+    ]:
+        email = f"{name.split()[0].lower()}@example.com"
+        signup = client.post(
+            "/api/v1/auth/signup",
+            json={"name": "Owner", "email": email, "phone": f"0809 777 {len(name):04d}", "password": "password-123",
+                  "business_name": name, "category": category, "area": "Ikeja, Lagos", "about": about},
+        )
+        assert signup.status_code == 201, signup.text
+        headers = {"Authorization": f"Bearer {signup.json()['access_token']}"}
+        client.post("/api/v1/services", json={"name": service, "price_naira": 50_000, "duration_min": 60}, headers=headers)
+
+    found = call_tool(client, "customer", "find_businesses", {"need": "furniture for my new apartment"})
+    names = [o["name"] for o in found["options"]]
+    assert names[0] == "Oak Furniture Works" and "Flow Plumbing" not in names, names
+
+
 def test_gadget_store_found_for_phone_search(client: TestClient) -> None:
     signup = client.post(
         "/api/v1/auth/signup",

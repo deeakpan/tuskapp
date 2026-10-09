@@ -40,6 +40,9 @@ SEARCH_DAYS = 7
 MAX_OPTIONS = 5
 # Options matching less than this share of what the best option matches are noise ("office" in "office delivery").
 MIN_RELATIVE_FIT = 0.5
+# A word only in the about text or a description ("new buildings") counts for less than one in the
+# business's name, category or service names ("Furniture").
+DESCRIBED_WEIGHT = 0.4
 
 
 @dataclass
@@ -98,10 +101,9 @@ def _candidate(
         overlap = {s.id: len(words & keywords(f"{s.name} {s.description}")) for s in services}
         best = max(overlap.values())
         matched = [s for s in services if best and overlap[s.id] == best]
-        found = keywords(f"{business.name} {business.category} {business.about}")
-        for service in matched:
-            found |= keywords(f"{service.name} {service.description}")
-        fit = len(words & found) / len(words)
+        named = keywords(f"{business.name} {business.category} {' '.join(s.name for s in matched)}")
+        described = keywords(f"{business.about} {' '.join(s.description for s in matched)}")
+        fit = (len(words & named) + DESCRIBED_WEIGHT * len((words & described) - named)) / len(words)
         # A casual description ("something for my sister's wedding") may share no words with a business
         # that's still the right kind; the category keeps it in, ranked below anything that does match.
         if not fit and not prefs.category:
