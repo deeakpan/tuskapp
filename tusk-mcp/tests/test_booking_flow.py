@@ -65,6 +65,19 @@ def test_discovery(client: TestClient) -> None:
         client, "customer", "contact_business", {"slug": "glam-by-tolu", "reason": "Change my time", "ref": "gbt-0412"}
     )
     assert "booking%20GBT-0412" in contact["whatsapp_url"]
+    assert contact["phone"] == "0803 000 0001" and contact["owner_alerted"] is False
+
+    contact = call_tool(
+        client,
+        "customer",
+        "contact_business",
+        {"slug": "glam-by-tolu", "reason": "Can you do my braids at home?", "name": "Ime", "phone": "0803 123 4567"},
+    )
+    assert contact["owner_alerted"] is True
+    tolu = login(client, "tolu@tuskapp.demo")
+    alerts = client.get("/api/v1/notifications", headers=tolu).json()
+    alerts = alerts.get("items", alerts) if isinstance(alerts, dict) else alerts
+    assert any("Ime" in a["notification"]["message"] and "0803 123 4567" in a["notification"]["message"] for a in alerts), alerts
     with pytest.raises(ToolFailed, match="Which business"):
         call_tool(client, "customer", "get_business")
 

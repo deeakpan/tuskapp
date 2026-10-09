@@ -130,6 +130,12 @@ def account_phone(phone: str) -> str:
     return f"+234{key}" if len(key) == 10 else key
 
 
+def local_phone(phone: str) -> str:
+    """The number as Nigerians dial it (0803 000 0001)."""
+    key = phone_key(phone)
+    return f"0{key[:3]} {key[3:6]} {key[6:]}" if len(key) == 10 else phone
+
+
 def whatsapp_link(phone: str, text: str = "") -> str | None:
     """A wa.me click-to-chat link that opens WhatsApp with `text` already typed."""
     number = account_phone(phone).lstrip("+")

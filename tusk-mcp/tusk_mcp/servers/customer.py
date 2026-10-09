@@ -51,9 +51,10 @@ mcp = FastMCP(
         "Use list_services for prices and photos, check_availability before create_booking, and ask_business "
         "for policy questions. Before booking, ask for the customer's name, phone number and email. "
         "Only quote prices and facts returned by the tools. Prices are in Naira (₦). "
-        "You are not the business owner and cannot pass messages back and forth. When the customer needs a "
-        "person (a complaint, a custom request, changing a confirmed booking), call contact_business and "
-        "give them the WhatsApp link."
+        "To pay, hold it with create_booking: it returns a Paystack link for the deposit. "
+        "You are not the business owner and cannot pass messages back and forth. When the customer wants to "
+        "talk to the seller (their number, haggling, a complaint, a custom request, changing a booking), ask "
+        "for their name and phone, call contact_business, and give them the number and WhatsApp link."
     ),
     stateless_http=True,
     json_response=True,
@@ -198,26 +199,55 @@ def ask_business(
     return result
 
 
-@tool(annotations=READ_ONLY)
+@tool()
 def contact_business(
     reason: Annotated[str, Field(description="What the customer wants to talk about, in a few words")],
     slug: Slug = None,
     ref: Annotated[str | None, Field(description="Booking ref, if it's about a booking")] = None,
+    name: Annotated[str | None, Field(description="Customer's name, so the owner knows who to call back")] = None,
+    phone: Annotated[str | None, Field(description="Customer's phone, so the owner can call or WhatsApp them")] = None,
+    email: Annotated[EmailStr | None, Field(description="Customer's email")] = None,
 ) -> dict[str, Any]:
-    """WhatsApp link to reach the business directly, with the message already written.
+    """The business's phone number and a WhatsApp link with the message already written.
 
-    Use for complaints, custom requests or changes to a confirmed booking. Chat can't relay messages."""
+    Use when the customer wants to talk to the seller (negotiate, ask for their number, a custom request,
+    a complaint, changing a confirmed booking). Ask for the customer's name and phone first and pass them:
+    the owner is alerted with them so they can reach the customer too. Chat can't relay messages."""
+    about = f" about booking {ref.strip().upper()}" if ref else ""
     with session_scope() as session:
         business = _business(session, slug)
-        about = f" about booking {ref.strip().upper()}" if ref else ""
+        number = business.whatsapp
         whatsapp = business.whatsapp_url(f"Hi {business.name}, I'm messaging{about} from TuskApp: {reason}")
-        if whatsapp:
-            return {"business": business.name, "whatsapp_url": whatsapp, "message": "Tap the link to open WhatsApp."}
-        return {
+        customer = biz.upsert_customer(session, business, name or "Customer", phone, email) if phone else None
+        if customer:
+            details = ", ".join(p for p in (customer.phone, customer.email) if p)
+            notify_team(
+                session,
+                business,
+                "Customer wants to talk",
+                f"{customer.name} ({details}) wants to talk{about}: {reason}",
+                email=True,
+                sms=True,
+            )
+            chat = (business.id, customer.id)
+        result = {
             "business": business.name,
-            "whatsapp_url": None,
-            "message": "This business hasn't added WhatsApp yet. Use ask_business so the owner gets the message.",
+            "phone": biz.local_phone(number) if number else None,
+            "whatsapp_url": whatsapp,
+            "owner_alerted": customer is not None,
+            "message": (
+                "Share the number and WhatsApp link."
+                + (f" {business.name} has the customer's details and may reach out too." if customer else "")
+                if number
+                else "This business hasn't added a phone number yet."
+                + (" The owner has been alerted with the customer's details." if customer else
+                   " Ask for the customer's name and phone and call this again so the owner can reach them.")
+            ),
         }
+    if customer:
+        record_chat(*chat, [("customer", f"I'd like to talk to {result['business']}{about}: {reason}"),
+                            ("assistant", "Shared the business's number and alerted the owner.")])
+    return result
 
 
 @tool()
