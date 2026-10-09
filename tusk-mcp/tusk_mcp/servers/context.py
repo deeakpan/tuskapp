@@ -3,6 +3,7 @@
 import functools
 import inspect
 import json
+import os
 import time
 from collections.abc import Callable
 from contextvars import ContextVar
@@ -64,8 +65,12 @@ class OwnerTokenVerifier:
 def transport_security() -> TransportSecuritySettings:
     public = urlsplit(settings.PUBLIC_BASE_URL)
     local = ["127.0.0.1", "localhost", "[::1]"]
-    hosts = [public.netloc, *(f"{host}:*" for host in local), *local]
-    origins = [f"{public.scheme}://{public.netloc}", *(f"http://{host}:*" for host in local)]
+    public_hosts = {public.netloc}
+    if railway_domain := os.environ.get("RAILWAY_PUBLIC_DOMAIN"):
+        public_hosts.add(railway_domain)
+    hosts = [*public_hosts, *(f"{host}:*" for host in local), *local]
+    origins = [*(f"https://{host}" for host in public_hosts), f"{public.scheme}://{public.netloc}"]
+    origins += [f"http://{host}:*" for host in local]
     return TransportSecuritySettings(
         enable_dns_rebinding_protection=True, allowed_hosts=hosts, allowed_origins=origins
     )

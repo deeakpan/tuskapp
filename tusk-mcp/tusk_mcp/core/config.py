@@ -1,3 +1,6 @@
+import os
+from urllib.parse import urlsplit
+
 from msflib.account.config import AccountSettings
 from msflib.auth.config import AuthSettings
 from msflib.conversation.config import ConversationSettings
@@ -64,3 +67,12 @@ class AppSettings(
 
 
 settings = AppSettings()
+
+# Railway sets RAILWAY_PUBLIC_DOMAIN. Use it while PUBLIC_BASE_URL is unset or still a placeholder;
+# an explicit URL (e.g. a custom domain) wins.
+if (railway_domain := os.environ.get("RAILWAY_PUBLIC_DOMAIN")) and urlsplit(settings.PUBLIC_BASE_URL).hostname in (
+    "127.0.0.1",
+    "localhost",
+    "your-railway-url.up.railway.app",
+):
+    settings.PUBLIC_BASE_URL = f"https://{railway_domain}"
