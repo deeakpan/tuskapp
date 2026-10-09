@@ -12,6 +12,19 @@ from tests.mcp_client import call_tool
 REDIRECT = "https://claude.ai/api/mcp/auth_callback"
 
 
+def test_mcp_links_work_without_trailing_slash(client: TestClient) -> None:
+    init = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {"protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "t", "version": "1"}},
+    }
+    headers = {"Accept": "application/json, text/event-stream"}
+    for path in ("/mcp/customer", "/mcp/customer/"):
+        assert client.post(path, json=init, headers=headers, follow_redirects=False).status_code == 200
+    assert client.post("/mcp/owner", json=init, headers=headers, follow_redirects=False).status_code == 401
+
+
 def test_owner_connects_by_signing_in(client: TestClient, tolu: dict[str, str]) -> None:
     challenge = client.post("/mcp/owner/", json={}, headers={"Accept": "application/json, text/event-stream"})
     assert challenge.status_code == 401

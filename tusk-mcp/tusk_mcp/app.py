@@ -46,7 +46,22 @@ async def lifespan(app: FastAPI):
         yield
 
 
+class McpTrailingSlash:
+    """Serves /mcp/customer and /mcp/owner as if the trailing slash were there; connectors don't follow redirects."""
+
+    PATHS = {"/mcp/customer", "/mcp/owner"}
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http" and scope["path"] in self.PATHS:
+            scope = {**scope, "path": scope["path"] + "/", "raw_path": scope["path"].encode() + b"/"}
+        await self.app(scope, receive, send)
+
+
 app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan)
+app.add_middleware(McpTrailingSlash)
 bind_app_emitter(app)
 app.add_middleware(
     CORSMiddleware,
@@ -159,7 +174,8 @@ async def paystack_webhook(request: Request) -> JSONResponse:
 
 
 def main() -> None:
-    uvicorn.run(app, host=settings.HOST, port=settings.PORT)
+    # Behind Railway's proxy: trust X-Forwarded-Proto so any redirect stays on https.
+    uvicorn.run(app, host=settings.HOST, port=settings.PORT, proxy_headers=True, forwarded_allow_ips="*")
 
 
 if __name__ == "__main__":
