@@ -19,7 +19,7 @@ from tusk_mcp.api.router import api_router
 from tusk_mcp.core.config import settings
 from tusk_mcp.db.session import engine, session_scope
 from tusk_mcp.seed import seed_demo
-from tusk_mcp.servers import customer, owner
+from tusk_mcp.servers import customer, oauth, owner
 from tusk_mcp.services import business as biz
 from tusk_mcp.services.business import BookingError, NotFound, booking_by_ref, naira, when_label
 from tusk_mcp.services.chats import record_chat
@@ -58,6 +58,7 @@ app.add_middleware(
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.mount("/mcp/customer", customer_app)
 app.mount("/mcp/owner", owner_app)
+oauth.install(app)
 if settings.STORAGE_METHOD == "file":
     # MSFLib's local storage writes to STORAGE_PATH; cloud methods (s3, cloudinary...) serve their own URLs.
     Path(settings.STORAGE_PATH).mkdir(parents=True, exist_ok=True)

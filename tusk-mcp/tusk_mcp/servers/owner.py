@@ -35,7 +35,7 @@ mcp = FastMCP(
     token_verifier=OwnerTokenVerifier(),
     auth=AuthSettings(
         issuer_url=settings.PUBLIC_BASE_URL,
-        resource_server_url=f"{settings.PUBLIC_BASE_URL}/mcp/owner",
+        resource_server_url=f"{settings.PUBLIC_BASE_URL}/mcp/owner/",
         required_scopes=["owner"],
         validate_token_resource=False,
     ),

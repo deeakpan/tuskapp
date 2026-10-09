@@ -46,6 +46,7 @@ from .tusk import (
     McpToken,
     McpTokenCreate,
     McpTokenUpdate,
+    OAuthClient,
     Service,
     ServiceCreate,
     ServiceUpdate,

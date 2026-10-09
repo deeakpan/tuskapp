@@ -8,7 +8,7 @@ os.environ["SQLITE_DATABASE_URI"] = f"sqlite:///{TEST_DIR / 'tusk-test.db'}"
 os.environ["STORAGE_PATH"] = str(TEST_DIR / "uploads")
 os.environ["SEED_DEMO"] = "true"
 os.environ["PAYSTACK_SECRET_KEY"] = ""
-os.environ["PUBLIC_BASE_URL"] = "http://testserver"
+os.environ["PUBLIC_BASE_URL"] = "http://localhost"
 os.environ["GEOCODER_URL"] = ""
 
 import pytest  # noqa: E402
@@ -19,7 +19,7 @@ from tusk_mcp.app import app  # noqa: E402
 
 @pytest.fixture(scope="session")
 def client() -> Iterator[TestClient]:
-    with TestClient(app) as test_client:
+    with TestClient(app, base_url="http://localhost") as test_client:
         yield test_client
 
 

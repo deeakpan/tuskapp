@@ -42,6 +42,16 @@ def list_mcp_tokens(session: Session, business: Business) -> list[McpToken]:
     return list(session.exec(stmt))
 
 
+def revoke_mcp_token(session: Session, token: str) -> None:
+    """Deletes the row behind an owner MCP token, which makes the token invalid."""
+    try:
+        claims = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        return
+    if row := mcp_token_action.get_by_all(session, jti=claims.get("jti")):
+        session.delete(row)
+
+
 @dataclass
 class OwnerAccess:
     account: Account

@@ -224,6 +224,15 @@ class McpTokenCreate(SchemaBase):
     prefix: str
 
 
+class OAuthClient(ModelBase, table=True):
+    """A chat app (Claude, ChatGPT...) that registered itself to sign owners in to the owner MCP."""
+
+    __tablename__ = "tusk_oauth_client"
+
+    client_id: str = Field(unique=True, index=True)
+    info: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+
+
 class McpTokenUpdate(SchemaBase):
     last_used_at: datetime | None = None
 

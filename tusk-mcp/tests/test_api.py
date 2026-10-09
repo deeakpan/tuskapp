@@ -117,15 +117,15 @@ def test_service_photos_use_msflib_storage(client: TestClient, tolu: dict[str, s
     uploaded = client.post(url, files={"photo": ("braids.png", png, "image/png")}, headers=tolu)
     assert uploaded.status_code == 201, uploaded.text
     photo = uploaded.json()["photo_urls"][0]
-    assert photo.startswith("http://testserver/uploads/workspace/")
-    assert client.get(photo.removeprefix("http://testserver")).content == png
+    assert photo.startswith("http://localhost/uploads/workspace/")
+    assert client.get(photo.removeprefix("http://localhost")).content == png
 
     not_image = client.post(url, files={"photo": ("menu.pdf", b"%PDF", "application/pdf")}, headers=tolu)
     assert not_image.status_code == 415
 
     removed = client.delete(url, params={"url": photo}, headers=tolu)
     assert removed.json()["photo_urls"] == []
-    assert client.get(photo.removeprefix("http://testserver")).status_code == 404
+    assert client.get(photo.removeprefix("http://localhost")).status_code == 404
 
 
 def test_business_settings_live_in_workspace_config(client: TestClient) -> None:

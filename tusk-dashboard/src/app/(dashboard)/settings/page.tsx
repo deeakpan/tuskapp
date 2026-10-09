@@ -132,8 +132,8 @@ async function Connect() {
       </Card>
       <Card>
         <CardHeader
-          title="Manage your business from Claude"
-          subtitle="Private, for you and your staff. Ask “what’s booked tomorrow?” or “raise cornrows to ₦9,000”. Make one token per app or person; revoke it any time."
+          title="Manage your business from ChatGPT or Claude"
+          subtitle="Private, for you and your staff. Add this link as a connector and sign in with your TuskApp email and password when asked. Then ask “what’s booked tomorrow?” or “raise cornrows to ₦9,000”."
         />
         <div className="space-y-4 p-5">
           <div className="flex items-center gap-2">
@@ -142,6 +142,10 @@ async function Connect() {
             </code>
             <CopyButton value={business.owner_mcp_url} />
           </div>
+          <p className="text-[13px] text-ink-2/80">
+            Connected apps appear below; remove one to disconnect it. For apps without a sign-in step (Cursor, Claude
+            Desktop config files), make a token instead.
+          </p>
           <TokenCreator ownerUrl={business.owner_mcp_url} />
           {tokens.length > 0 && (
             <ul className="divide-y divide-line rounded-xl border border-line">
