@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "tusk-mcp"
+version = "0.2.0"
+description = "TuskApp backend on MSFLib: Customer and Owner MCP servers plus the dashboard API"
+authors = ["deeakpan <deeakpan123@gmail.com>"]
+packages = [{ include = "tusk_mcp" }]
+[tool.poetry.dependencies]
+python = ">=3.12,<3.15"
+msflib = { git = "https://github.com/msflib/fastapi.git", subdirectory = "core", rev = "core-v0.2.1" }
+msflib-auth = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/auth", rev = "auth-v0.2.2" }
+msflib-account = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/account", rev = "account-v0.2.2" }
+msflib-tenancy = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/tenancy", rev = "tenancy-v0.2.0" }
+msflib-workspaces = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/workspaces", rev = "workspaces-v0.2.1" }
+msflib-workspace-config = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/workspace_config", rev = "workspace_config-v0.2.1" }
+msflib-payments = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/payments", rev = "payments-v0.2.1" }
+msflib-notifications = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/notifications", rev = "notifications-v0.2.1" }
+msflib-conversation = { git = "https://github.com/msflib/fastapi.git", subdirectory = "modules/conversation", rev = "conversation-v0.2.0" }
+mcp = "^1.20"
+uvicorn = { version = "*", extras = ["standard"] }
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+
+[tool.poetry.scripts]
+tusk-mcp = "tusk_mcp.app:main"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-p msflib.utils.tests.fast_bcrypt"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"

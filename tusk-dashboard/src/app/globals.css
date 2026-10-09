@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+
+  --font-weight-book: 485;
+  --font-weight-strong: 535;
+}
+
+/* Not inline: utilities read these variables, so [data-theme="light"] can swap them per section. */
+@theme {
+  --color-bg: #121212;
+  --color-panel: #1a1a1a;
+  --color-panel-2: #222222;
+  --color-raised: #2a2a2a;
+  --color-line: #2c2c2c;
+  --color-line-strong: #3a3a3a;
+  --color-ink: #f2f2f2;
+  --color-ink-2: #c9c9c9;
+  --color-muted: #8a8a8a;
+  --color-faint: #5c5c5c;
+
+  --color-forest: #0f2a1e;
+  --color-forest-2: #16382a;
+  --color-forest-3: #1f4b38;
+  --color-mint: #5fd39a;
+  --color-amber: #f5b84a;
+  --color-coral: #f2706b;
+  --color-sky: #6cb6ff;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+/* Set by ThemeSection (the sun/moon switch on the login and signup forms). */
+[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #f6f6f3;
+  --color-panel: #ffffff;
+  --color-panel-2: #f0f0ec;
+  --color-raised: #e8e8e3;
+  --color-line: #e2e2dc;
+  --color-line-strong: #cfcfc8;
+  --color-ink: #151515;
+  --color-ink-2: #3b3b3b;
+  --color-muted: #686868;
+  --color-faint: #9b9b96;
+  --color-mint: #16824f;
+  --color-coral: #c9423c;
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-weight: 485;
+  letter-spacing: -0.02em;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+.num {
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--color-forest-3);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #222 0%, #2e2e2e 40%, #3a3a3a 50%, #2e2e2e 60%, #222 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.live-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}

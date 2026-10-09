@@ -1,0 +1,25 @@
+# Upstream template, kept locally for reference only (it's its own git repo).
+fastapi-template/
+
+# Secrets: real values live only in local env files. Examples (empty values) are committed.
+.env
+.env.*
+.env-*
+!.env.example
+!.env-example
+
+# Local editor config (mcp.json holds an owner MCP token)
+.cursor/
+
+# Dependencies and build output
+node_modules/
+.venv/
+__pycache__/
+.next/
+dist/
+
+# Local data
+*.db
+*.db-shm
+*.db-wal
+uploads/
