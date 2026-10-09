@@ -23,11 +23,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               booked before they leave the chat.
             </p>
           </div>
-          {/* Sized from the area's height so ~90% of the phone shows and its bottom edge runs off the section. */}
-          <div className="relative mt-10 min-h-[320px] flex-1 [container-type:size]">
+          {/* Pinned to the top and sized from the area's height, so ~90% of the phone shows and its bottom edge
+              runs off the section; short windows keep it at least 280px wide and crop more. */}
+          <div className="relative mt-6 min-h-[360px] flex-1 [container-type:size]">
             <ChatPhone
               priority
-              className="absolute bottom-0 left-1/2 w-[min(340px,52cqh)] -translate-x-1/2 translate-y-[10%]"
+              sizes="420px"
+              className="absolute top-0 left-1/2 w-[min(420px,max(60cqh,280px),80cqw)] -translate-x-1/2"
             />
           </div>
         </div>

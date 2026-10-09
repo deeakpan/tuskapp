@@ -4,7 +4,10 @@ import claudeScreen from "@/assets/claude-uyo.jpg";
 import { CHATGPT_PREVIEW_ALT, CLAUDE_PREVIEW_ALT } from "@/lib/site";
 import { cx } from "./ui";
 
-/** An iPhone 13 Pro shell (graphite frame, notch) around a 9:16 screen image. Position it via `className`. */
+/**
+ * An iPhone shell (graphite frame, notch) around a 9:16 screen image. Position it via `className`.
+ * Frame, bezel and corners are in `cqw` of the phone itself, so they stay slim at any size.
+ */
 function Phone({
   screen,
   alt,
@@ -19,22 +22,19 @@ function Phone({
   sizes: string;
 }) {
   return (
-    <div
-      className={cx(
-        "rounded-[44px] bg-gradient-to-b from-[#4a4d52] via-[#2b2d30] to-[#3a3c40] p-[3px] shadow-[0_40px_90px_-25px_rgba(0,0,0,0.9)]",
-        className,
-      )}
-    >
-      <span className="absolute top-[22%] -left-[2px] h-[7%] w-[3px] rounded-l bg-[#3a3c40]" aria-hidden />
-      <span className="absolute top-[31%] -left-[2px] h-[7%] w-[3px] rounded-l bg-[#3a3c40]" aria-hidden />
-      <span className="absolute top-[26%] -right-[2px] h-[11%] w-[3px] rounded-r bg-[#3a3c40]" aria-hidden />
-      <div className="rounded-[41px] bg-black p-[9px]">
-        <div className="relative overflow-hidden rounded-[33px] bg-white">
-          <Image src={screen} alt={alt} priority={priority} placeholder="blur" sizes={sizes} className="h-auto w-full" />
-          <span
-            className="absolute top-0 left-1/2 h-[3.4%] w-[36%] -translate-x-1/2 rounded-b-[14px] bg-black"
-            aria-hidden
-          />
+    <div className={cx("[container-type:inline-size]", className)}>
+      <div className="relative rounded-[14cqw] bg-gradient-to-b from-[#4a4d52] via-[#2b2d30] to-[#3a3c40] p-[0.7cqw] shadow-[0_40px_90px_-25px_rgba(0,0,0,0.9)]">
+        <span className="absolute top-[22%] -left-[0.5cqw] h-[7%] w-[0.8cqw] rounded-l bg-[#3a3c40]" aria-hidden />
+        <span className="absolute top-[31%] -left-[0.5cqw] h-[7%] w-[0.8cqw] rounded-l bg-[#3a3c40]" aria-hidden />
+        <span className="absolute top-[26%] -right-[0.5cqw] h-[11%] w-[0.8cqw] rounded-r bg-[#3a3c40]" aria-hidden />
+        <div className="rounded-[13.3cqw] bg-black p-[1.6cqw]">
+          <div className="relative overflow-hidden rounded-[11.7cqw] bg-white">
+            <Image src={screen} alt={alt} priority={priority} placeholder="blur" sizes={sizes} className="h-auto w-full" />
+            <span
+              className="absolute top-0 left-1/2 h-[3.2%] w-[34%] -translate-x-1/2 rounded-b-[4cqw] bg-black"
+              aria-hidden
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -42,9 +42,17 @@ function Phone({
 }
 
 /** ChatGPT booking a business, in one upright phone. Position it via `className`. */
-export function ChatPhone({ className, priority = false }: { className?: string; priority?: boolean }) {
+export function ChatPhone({
+  className,
+  priority = false,
+  sizes = "340px",
+}: {
+  className?: string;
+  priority?: boolean;
+  sizes?: string;
+}) {
   return (
-    <Phone screen={chatgptScreen} alt={CHATGPT_PREVIEW_ALT} priority={priority} sizes="340px" className={className} />
+    <Phone screen={chatgptScreen} alt={CHATGPT_PREVIEW_ALT} priority={priority} sizes={sizes} className={className} />
   );
 }
 
