@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 from contextlib import AsyncExitStack, asynccontextmanager
 from html import escape
 from pathlib import Path
@@ -24,6 +25,9 @@ from tusk_mcp.services import business as biz
 from tusk_mcp.services.business import BookingError, NotFound, booking_by_ref, naira, when_label
 from tusk_mcp.services.chats import record_chat
 from tusk_mcp.services.payments import complete_payment, is_test_checkout, payment_by_reference
+
+for _noisy in ("mcp.server.streamable_http", "mcp.server.streamable_http_manager", "mcp.server.lowlevel.server", "httpx"):
+    logging.getLogger(_noisy).setLevel(logging.WARNING)
 
 customer_app = customer.mcp.streamable_http_app()
 owner_app = owner.mcp.streamable_http_app()
