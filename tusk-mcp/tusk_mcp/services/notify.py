@@ -1,7 +1,8 @@
 """Owner notifications through msflib.notifications.
 
 Every alert lands in the dashboard. Email is for things that need the owner (a confirmed order, a
-question waiting for an answer); SMS only for confirmed orders, so a phone buzz always means money in.
+question waiting for an answer); SMS only for confirmed orders and customers asking to talk, so a phone
+buzz always means money in or someone waiting on a call.
 Chat messages and unpaid holds never leave the dashboard.
 """
 
