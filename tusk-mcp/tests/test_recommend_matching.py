@@ -24,6 +24,7 @@ def test_category_beats_a_word_in_someone_elses_about(client: TestClient) -> Non
     found = call_tool(client, "customer", "find_businesses", {"need": "furniture for my new apartment"})
     names = [o["name"] for o in found["options"]]
     assert names[0] == "Oak Furniture Works" and "Flow Plumbing" not in names, names
+    assert "Flow Plumbing" in [o["name"] for o in found["also_consider"]]
 
 
 def test_gadget_store_found_for_phone_search(client: TestClient) -> None:

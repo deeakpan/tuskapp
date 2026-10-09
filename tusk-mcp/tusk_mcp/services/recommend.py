@@ -38,6 +38,7 @@ WEIGHTS: dict[str, dict[str, float]] = {
 OVER_BUDGET_PENALTY = 0.6
 SEARCH_DAYS = 7
 MAX_OPTIONS = 5
+MAX_EXTRAS = 3
 # Options matching less than this share of what the best option matches are noise ("office" in "office delivery").
 MIN_RELATIVE_FIT = 0.5
 # A word only in the about text or a description ("new buildings") counts for less than one in the
@@ -255,11 +256,12 @@ def recommend(session: Session, prefs: Preferences) -> dict[str, Any]:
     notes = []
     if prefs.near and origin is None:
         notes.append(f"Couldn't place “{prefs.near}” on a map, so distance is judged by area name only.")
-    if not options:
-        notes.append("No business on TuskApp matches that yet. Try fewer details or another area.")
-    else:
+    extras: list[Option] = []
+    if options:
         best_fit = max(o.fit for o in options)
+        extras = [o for o in options if 0 < o.fit < best_fit * MIN_RELATIVE_FIT]
         options = [o for o in options if o.fit >= best_fit * MIN_RELATIVE_FIT]
+        extras.sort(key=lambda o: (o.distance_km is None, o.distance_km or 0, -o.fit))
         if best_fit == 0:
             notes.append(
                 "Nothing matched the request word for word; these are the closest kind of business. "
@@ -269,13 +271,28 @@ def recommend(session: Session, prefs: Preferences) -> dict[str, Any]:
         options.sort(key=lambda o: o.score, reverse=True)
         options = options[:MAX_OPTIONS]
         _describe(options, prefs)
+    else:
+        notes.append("No business on TuskApp matches that yet. Try fewer details or another area.")
     return {
         "options": [option_view(o, prefs) for o in options],
+        "also_consider": [
+            {
+                "slug": o.business.slug,
+                "name": o.business.name,
+                "category": o.business.category,
+                "area": o.business.area,
+                "price_from": naira(o.price_kobo),
+                "distance_km": round(o.distance_km, 1) if o.distance_km is not None else None,
+            }
+            for o in extras[:MAX_EXTRAS]
+        ],
         "ranked_by": prefs.priority,
         "notes": notes,
         "next_step": (
             "Offer one next step: prices and photos (list_services), a free time (check_availability) or "
-            "holding one (create_booking). For follow-ups, call find_businesses again with the narrower need."
+            "holding one (create_booking). For follow-ups, call find_businesses again with the narrower need. "
+            "If also_consider has businesses that fit their situation (e.g. a plumber or appliances for a new "
+            "apartment), mention one or two briefly as add-ons after the main options."
             if options
             else None
         ),
