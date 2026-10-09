@@ -48,7 +48,7 @@ function ActiveRailLinks() {
   return <RailLinks pathname={usePathname()} />;
 }
 
-/** Copies the business's customer MCP URL, the link owners paste into ChatGPT or Claude as a connector. */
+/** Copies the business's MCP link, which owners add to ChatGPT or Claude to run the business from chat. */
 export function RailCopyLink({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
   return (

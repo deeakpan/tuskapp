@@ -35,6 +35,39 @@ const ABOUT_PROMPTS = [
   "Languages you speak with customers",
 ];
 
+const MCP_SETUP = [
+  {
+    app: "ChatGPT",
+    steps: [
+      "Settings → Apps & Connectors → Advanced settings: turn on Developer mode.",
+      "Back in Apps & Connectors, click Create.",
+      "Name it TuskApp, paste your MCP link, choose OAuth, tick “I trust this application” and create it.",
+      "Sign in with your TuskApp email and password.",
+      "In a new chat, pick TuskApp from the + menu and ask away.",
+    ],
+  },
+  {
+    app: "Claude",
+    steps: [
+      "Settings → Connectors → Add custom connector.",
+      "Name it TuskApp, paste your MCP link and click Add.",
+      "Click Connect and sign in with your TuskApp email and password.",
+      "In any chat, ask away. TuskApp is on in the tools menu.",
+    ],
+  },
+];
+
+const MCP_ASKS = [
+  "What’s booked tomorrow?",
+  "Raise cornrows to ₦9,000",
+  "Make silk press 2 hours",
+  "Hide wig installation for now",
+  "Block next Monday",
+  "Cancel booking GBT-0412",
+  "Who booked this week?",
+  "What are customers asking about?",
+];
+
 const ALERTS = [
   { event: "Booking confirmed (deposit paid)", how: "Dashboard, email and SMS" },
   { event: "Customer question chat couldn’t answer", how: "Dashboard and email" },
@@ -113,38 +146,54 @@ async function Connect() {
           <CopyButton value={business.profile_url} />
         </div>
       </Card>
-      <Card className="overflow-hidden">
+      <Card id="mcp" className="overflow-hidden">
         <div className="bg-gradient-to-br from-forest-3 to-forest-2 px-5 py-5">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-strong">Customer MCP link</span>
-            <Tag>Share anywhere</Tag>
+            <span className="text-[15px] font-strong">Your MCP link</span>
+            <Tag>Private</Tag>
           </div>
           <p className="mt-1 text-[13px] text-ink-2/80">
-            Add this as a connector in ChatGPT or Claude. Chats start already inside {business.name}.
+            Add it to ChatGPT or Claude to run {business.name} from chat. You and your staff sign in with your TuskApp
+            email and password.
           </p>
           <div className="mt-4 flex items-center gap-2">
             <code className="num min-w-0 flex-1 truncate rounded-xl bg-black/30 px-3 py-2.5 text-[12.5px]">
-              {business.customer_mcp_url}
+              {business.owner_mcp_url}
             </code>
-            <CopyButton value={business.customer_mcp_url} variant="primary" />
+            <CopyButton value={business.owner_mcp_url} variant="primary" />
           </div>
+        </div>
+        <div className="grid gap-5 p-5">
+          {MCP_SETUP.map(({ app, steps }) => (
+            <div key={app}>
+              <p className="text-[14px] font-strong">{app}</p>
+              <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-[13px] text-ink-2/85 marker:text-muted">
+                {steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-line px-5 py-4">
+          <p className="text-[13px] font-strong">Then just ask</p>
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {MCP_ASKS.map((ask) => (
+              <li key={ask} className="rounded-full border border-line bg-panel-2 px-3 py-1 text-[12.5px] text-ink-2">
+                {ask}
+              </li>
+            ))}
+          </ul>
         </div>
       </Card>
       <Card>
         <CardHeader
-          title="Manage your business from ChatGPT or Claude"
-          subtitle="Private, for you and your staff. Add this link as a connector and sign in with your TuskApp email and password when asked. Then ask “what’s booked tomorrow?” or “raise cornrows to ₦9,000”."
+          title="Connected apps"
+          subtitle="Every ChatGPT or Claude that signed in to your MCP link. Remove one to disconnect it."
         />
         <div className="space-y-4 p-5">
-          <div className="flex items-center gap-2">
-            <code className="num min-w-0 flex-1 truncate rounded-xl bg-panel-2 px-3 py-2.5 text-[12.5px]">
-              {business.owner_mcp_url}
-            </code>
-            <CopyButton value={business.owner_mcp_url} />
-          </div>
           <p className="text-[13px] text-ink-2/80">
-            Connected apps appear below; remove one to disconnect it. For apps without a sign-in step (Cursor, Claude
-            Desktop config files), make a token instead.
+            For apps without a sign-in step (Cursor, Claude Desktop config files), make a token instead.
           </p>
           <TokenCreator ownerUrl={business.owner_mcp_url} />
           {tokens.length > 0 && (

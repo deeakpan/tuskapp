@@ -18,7 +18,7 @@ async function AccountActions() {
   return (
     <div className="flex items-center gap-2 sm:gap-3">
       <span className="hidden sm:block">
-        <CopyButton value={business.customer_mcp_url} label="Copy MCP link" variant="primary" />
+        <CopyButton value={business.owner_mcp_url} label="Copy MCP link" variant="primary" />
       </span>
       <div className="flex items-center gap-2.5 rounded-full border border-line bg-panel py-1 pr-1 pl-1">
         <Avatar name={business.name} className="size-7 rounded-full text-[10px]" />
@@ -42,12 +42,12 @@ async function AccountActions() {
 
 async function SidebarChatLink() {
   const { business } = await getMe();
-  return <RailCopyLink value={business.customer_mcp_url} />;
+  return <RailCopyLink value={business.owner_mcp_url} />;
 }
 
 async function StatusLink() {
   const { business } = await getMe();
-  return <span className="num truncate text-muted">{business.customer_mcp_url}</span>;
+  return <span className="num truncate text-muted">{business.owner_mcp_url}</span>;
 }
 
 function SearchBox({ className }: { className?: string }) {
@@ -105,7 +105,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             Live sync
           </span>
           <span className="text-faint" aria-hidden>·</span>
-          <span className="text-muted">Customer MCP</span>
+          <span className="text-muted">Your MCP</span>
           <Suspense fallback={<Skeleton className="h-2.5 w-48" />}>
             <StatusLink />
           </Suspense>

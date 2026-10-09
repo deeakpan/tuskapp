@@ -8,7 +8,7 @@ import { Card, Skeleton, buttonStyles } from "@/components/ui";
 import { getMe } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Thanks for joining",
-  description: "Your TuskApp business is ready. Add your services, set your hours and share your chat link.",
+  description: "Your TuskApp business is ready. Add your services, set your hours and connect ChatGPT or Claude.",
 };
 
 const STEPS = [
@@ -35,10 +35,10 @@ const STEPS = [
   },
   {
     icon: MessagesSquare,
-    title: "Share your chat link",
-    body: "Add it as a connector in ChatGPT or Claude, or post it on your Instagram and WhatsApp status.",
-    href: "/settings",
-    cta: "Connect apps",
+    title: "Run it from ChatGPT or Claude",
+    body: "Add your MCP link as a connector and sign in. Then check bookings, change prices or block days just by asking.",
+    href: "/settings#mcp",
+    cta: "Set it up",
   },
 ];
 
@@ -55,10 +55,10 @@ async function Greeting() {
       <Card className="mt-6 overflow-hidden">
         <div className="flex flex-col gap-3 bg-gradient-to-br from-forest-3 to-forest-2 p-5 sm:flex-row sm:items-center">
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-strong">Your customer MCP link</p>
-            <code className="num mt-1 block truncate text-[12.5px] text-ink-2">{business.customer_mcp_url}</code>
+            <p className="text-[13px] font-strong">Your MCP link</p>
+            <code className="num mt-1 block truncate text-[12.5px] text-ink-2">{business.owner_mcp_url}</code>
           </div>
-          <CopyButton value={business.customer_mcp_url} label="Copy link" variant="primary" />
+          <CopyButton value={business.owner_mcp_url} label="Copy link" variant="primary" />
         </div>
         <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center">
           <div className="min-w-0 flex-1">
