@@ -13,7 +13,7 @@ export function proxy(request: NextRequest) {
   const signedIn = request.cookies.has(SESSION_COOKIE);
 
   if (!signedIn && isDashboard(pathname)) {
-    return NextResponse.redirect(new URL("/login?as=business", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
   if (signedIn && AUTH_PATHS.includes(pathname)) {
     return NextResponse.redirect(new URL("/", request.url));

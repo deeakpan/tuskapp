@@ -51,5 +51,5 @@ export async function logout() {
   const token = await getToken();
   if (token) await request("/logout", { method: "DELETE" }, token).catch(() => undefined);
   await clearSession();
-  redirect("/login?as=business");
+  redirect("/login");
 }

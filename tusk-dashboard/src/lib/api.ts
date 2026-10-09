@@ -64,7 +64,7 @@ export async function request<T>(path: string, init: RequestInit = {}, token?: s
 /** Calls the API as the signed-in owner; sends them to log in again if the session is gone. */
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = await getToken();
-  if (!token) redirect("/login?as=business");
+  if (!token) redirect("/login");
   try {
     return await request<T>(path, init, token);
   } catch (error) {
