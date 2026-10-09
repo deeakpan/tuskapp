@@ -1,6 +1,7 @@
 "use client";
 
-import { RotateCw } from "lucide-react";
+import { LogOut, RotateCw } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 import { Card, buttonStyles } from "@/components/ui";
 
@@ -15,9 +16,14 @@ export default function DashboardError({ error, retry }: { error: Error & { dige
         The TuskApp server may be restarting. Your bookings and customers are safe — try again in a moment.
       </p>
       {error.digest && <p className="num mt-2 text-xs text-faint">Error ID {error.digest}</p>}
-      <button type="button" onClick={retry} className={`${buttonStyles.primary} mt-6`}>
-        <RotateCw className="size-4" aria-hidden /> Try again
-      </button>
+      <div className="mt-6 flex justify-center gap-2">
+        <button type="button" onClick={retry} className={buttonStyles.primary}>
+          <RotateCw className="size-4" aria-hidden /> Try again
+        </button>
+        <Link href="/auth/logout" prefetch={false} className={buttonStyles.secondary}>
+          <LogOut className="size-4" aria-hidden /> Sign out
+        </Link>
+      </div>
     </Card>
   );
 }

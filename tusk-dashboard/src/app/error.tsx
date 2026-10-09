@@ -20,6 +20,9 @@ export default function RootError({ error, retry }: { error: Error & { digest?: 
           <Link href="/" className={buttonStyles.secondary}>
             Go to dashboard
           </Link>
+          <Link href="/auth/logout" prefetch={false} className={buttonStyles.secondary}>
+            Sign out
+          </Link>
         </>
       }
     >

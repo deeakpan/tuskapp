@@ -68,7 +68,9 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     return await request<T>(path, init, token);
   } catch (error) {
-    if (error instanceof ApiError && error.status === 401) redirect("/auth/logout");
+    if (error instanceof ApiError && (error.status === 401 || error.message === "Account not found")) {
+      redirect("/auth/logout");
+    }
     throw error;
   }
 }
