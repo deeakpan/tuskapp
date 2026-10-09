@@ -228,20 +228,28 @@ def public_business(slug: str, session: SessionDep) -> dict[str, Any]:
 # Services
 
 
+def _duration(value: Any) -> Any:
+    return biz.parse_duration(value) if isinstance(value, str | int) and not isinstance(value, bool) else value
+
+
 class ServiceIn(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     description: str = ""
     price_naira: int = Field(gt=0)
-    duration_min: int = Field(gt=0)
+    duration_min: int = Field(gt=0, description="Minutes, or text like '2 hrs', '3 days', '1 week'")
     is_published: bool = True
+
+    _parse_duration = field_validator("duration_min", mode="before")(_duration)
 
 
 class ServicePatch(BaseModel):
     name: str | None = Field(None, min_length=2, max_length=120)
     description: str | None = None
     price_naira: int | None = Field(None, gt=0)
-    duration_min: int | None = Field(None, gt=0)
+    duration_min: int | None = Field(None, gt=0, description="Minutes, or text like '2 hrs', '3 days', '1 week'")
     is_published: bool | None = None
+
+    _parse_duration = field_validator("duration_min", mode="before")(_duration)
 
 
 @router.get("/services", tags=["services"])

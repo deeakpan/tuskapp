@@ -89,11 +89,56 @@ def naira(kobo: int) -> str:
     return f"₦{kobo / 100:,.0f}"
 
 
+DAY_MIN = 24 * 60
+WEEK_MIN = 7 * DAY_MIN
+# Jobs a day or longer (made-to-order furniture, installations) are booked as a short appointment to start them.
+ORDER_SLOT_MIN = 60
+_DURATION_UNITS = {
+    **dict.fromkeys(("w", "wk", "wks", "week", "weeks"), WEEK_MIN),
+    **dict.fromkeys(("d", "day", "days"), DAY_MIN),
+    **dict.fromkeys(("h", "hr", "hrs", "hour", "hours"), 60),
+    **dict.fromkeys(("m", "min", "mins", "minute", "minutes"), 1),
+}
+_DURATION_PART = re.compile(r"(\d+(?:\.\d+)?)\s*([a-z]+)")
+
+
+def _plural(n: float, unit: str) -> str:
+    return f"{n:g} {unit}" if n == 1 else f"{n:g} {unit}s"
+
+
 def duration_label(minutes: int) -> str:
+    if minutes >= WEEK_MIN and minutes % WEEK_MIN == 0:
+        return _plural(minutes / WEEK_MIN, "week")
+    if minutes >= DAY_MIN and minutes % DAY_MIN == 0:
+        return _plural(minutes / DAY_MIN, "day")
     if minutes < 60:
         return f"{minutes} mins"
-    hours = minutes / 60
-    return f"{hours:g} hr" if hours == 1 else f"{hours:g} hrs"
+    hours, mins = divmod(minutes, 60)
+    label = f"{hours} hr" if hours == 1 else f"{hours} hrs"
+    return f"{label} {mins} mins" if mins else label
+
+
+def parse_duration(value: str | int) -> int:
+    """'90', '90 mins', '1.5 hrs', '2h 30m', '3 days', '1 week' -> minutes."""
+    text = str(value).strip().lower()
+    if re.fullmatch(r"\d+", text):
+        minutes = int(text)
+    else:
+        parts = _DURATION_PART.findall(text)
+        leftover = re.sub(r"\s|,|\band\b", "", _DURATION_PART.sub("", text))
+        if not parts or leftover or any(unit not in _DURATION_UNITS for _, unit in parts):
+            raise ValueError(f"“{value}” isn't a duration. Try 90 mins, 2 hrs, 3 days or 1 week.")
+        minutes = round(sum(float(n) * _DURATION_UNITS[unit] for n, unit in parts))
+    if minutes > 26 * WEEK_MIN:
+        raise ValueError("Keep the duration under 6 months.")
+    if minutes <= 0:
+        raise ValueError("Duration must be more than 0.")
+    return minutes
+
+
+def slot_minutes(service: Service) -> int:
+    """How long the booking blocks the calendar."""
+    return service.duration_min if service.duration_min < DAY_MIN else ORDER_SLOT_MIN
 
 
 def time_label(value: datetime | time) -> str:
@@ -633,7 +678,7 @@ def free_start_times(session: Session, business: Business, service: Service, day
     expire_holds(session)
     day_start = datetime.combine(day, time(0), LAGOS)
     busy = _busy(session, business, day_start, day_start + timedelta(days=1))
-    length = timedelta(minutes=service.duration_min)
+    length = timedelta(minutes=slot_minutes(service))
     current = utcnow()
     free = []
     for weekday, opens, closes in business.hours:
@@ -688,7 +733,7 @@ def create_booking(
             customer_id=customer.id,
             service_name=service.name,
             start=start,
-            end=start + timedelta(minutes=service.duration_min),
+            end=start + timedelta(minutes=slot_minutes(service)),
             notes=notes,
             total_kobo=service.price_kobo,
             deposit_kobo=deposit,

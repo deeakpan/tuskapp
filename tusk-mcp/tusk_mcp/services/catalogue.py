@@ -65,20 +65,13 @@ def parse_price_kobo(value: str) -> int:
 
 
 def parse_duration_min(value: str) -> int:
-    """'90', '90 mins', '1.5 hrs', '2h 30m' -> minutes. Blank means a quick visit (products, pickups)."""
-    text = value.strip().lower()
-    if not text:
+    """'90', '1.5 hrs', '3 days', '1 week' -> minutes. Blank means a quick visit (products, pickups)."""
+    if not value.strip():
         return DEFAULT_DURATION_MIN
-    if re.fullmatch(r"\d+", text):
-        return int(text)
-    hours = re.search(r"(\d+(?:\.\d+)?)\s*h", text)
-    minutes = re.search(r"(\d+)\s*m", text)
-    if not hours and not minutes:
-        raise CatalogueError(f"duration “{value}” should be minutes, e.g. 90 or 1.5 hrs")
-    total = round(float(hours[1]) * 60 if hours else 0) + (int(minutes[1]) if minutes else 0)
-    if total <= 0:
-        raise CatalogueError("duration must be more than 0")
-    return total
+    try:
+        return biz.parse_duration(value)
+    except ValueError as exc:
+        raise CatalogueError(str(exc)) from exc
 
 
 def _published(value: str) -> bool:

@@ -157,6 +157,12 @@ def check_availability(
             "date": f"{date:%a %d %b %Y}",
             "free_start_times": [{"label": time_label(s), "start_time": s.isoformat()} for s in free],
             "message": None if free else "No free times that day. Try another date.",
+            "note": (
+                f"Takes about {biz.duration_label(service.duration_min)} to complete. "
+                "The time booked is a 1-hour appointment to place the order and start the job."
+                if biz.slot_minutes(service) != service.duration_min
+                else None
+            ),
         }
 
 

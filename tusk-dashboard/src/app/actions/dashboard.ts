@@ -47,7 +47,7 @@ export async function createService(_: ActionState, form: FormData): Promise<Act
         name: text(form, "name"),
         description: text(form, "description"),
         price_naira: optionalNumber(form, "price_naira"),
-        duration_min: optionalNumber(form, "duration_min"),
+        duration_min: text(form, "duration_min"),
       }),
     "Service added",
   );
@@ -60,7 +60,7 @@ export async function updateService(id: number, _: ActionState, form: FormData):
         name: text(form, "name") || undefined,
         description: text(form, "description"),
         price_naira: optionalNumber(form, "price_naira"),
-        duration_min: optionalNumber(form, "duration_min"),
+        duration_min: text(form, "duration_min") || undefined,
       }),
     "Saved — customers in chat see this now",
   );

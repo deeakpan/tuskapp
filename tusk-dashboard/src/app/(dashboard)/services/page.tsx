@@ -34,8 +34,8 @@ function ServiceFields({ service }: { service?: Service }) {
         <Field label="Price (₦)">
           <input name="price_naira" required inputMode="numeric" defaultValue={service ? service.price_kobo / 100 : ""} className={`${inputStyles} num`} placeholder="35000" />
         </Field>
-        <Field label="Duration (mins)">
-          <input name="duration_min" required inputMode="numeric" defaultValue={service?.duration_min} className={`${inputStyles} num`} placeholder="120" />
+        <Field label="Duration">
+          <input name="duration_min" required defaultValue={service?.duration} className={inputStyles} placeholder="2 hrs, 3 days, 1 week" />
         </Field>
       </div>
       <Field label="Description">

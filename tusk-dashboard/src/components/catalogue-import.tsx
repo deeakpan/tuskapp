@@ -14,7 +14,7 @@ export function CatalogueImport() {
     <form action={action} className="space-y-3">
       <p className="text-[13px] text-muted">
         Have a price list in Excel or Google Sheets? Save it as CSV with columns <b className="text-ink-2">name</b>,{" "}
-        <b className="text-ink-2">price</b> and optionally duration, description and published. Items with the same
+        <b className="text-ink-2">price</b> and optionally duration (e.g. 2 hrs, 3 days, 1 week), description and published. Items with the same
         name are updated, not duplicated.
       </p>
       <input

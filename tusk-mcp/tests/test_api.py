@@ -1,6 +1,12 @@
+from datetime import datetime, timedelta
+
+import pytest
 from fastapi.testclient import TestClient
 
 from tests.conftest import login
+from tests.mcp_client import call_tool
+from tusk_mcp.services import business as biz
+from tusk_mcp.services.business import LAGOS
 
 
 def test_signup_then_msflib_login_and_logout(client: TestClient) -> None:
@@ -41,6 +47,45 @@ def test_signup_then_msflib_login_and_logout(client: TestClient) -> None:
     assert client.delete("/api/v1/logout", headers=headers).status_code == 200
     assert client.get("/api/v1/me", headers=headers).status_code == 401
     assert client.get("/api/v1/me", headers=login(client, "ada@example.com", "ada-password-1")).status_code == 200
+
+
+@pytest.mark.parametrize(
+    ("text", "minutes"),
+    [("90", 90), ("90 mins", 90), ("1.5 hrs", 90), ("2h 30m", 150), ("3 days", 4320), ("1 week", 10080),
+     ("1 week and 2 days", 12960), ("2 Weeks", 20160)],
+)
+def test_parse_duration(text: str, minutes: int) -> None:
+    assert biz.parse_duration(text) == minutes
+
+
+@pytest.mark.parametrize("text", ["soon", "1 month", "0", "two weeks", "3 days please"])
+def test_parse_duration_rejects(text: str) -> None:
+    with pytest.raises(ValueError):
+        biz.parse_duration(text)
+
+
+def test_week_long_service_is_bookable(client: TestClient, tolu: dict[str, str]) -> None:
+    created = client.post(
+        "/api/v1/services",
+        json={"name": "Bridal makeup package", "price_naira": 150_000, "duration_min": "1 week"},
+        headers=tolu,
+    )
+    assert created.status_code == 201, created.text
+    service = created.json()
+    assert (service["duration_min"], service["duration"]) == (10080, "1 week")
+
+    edited = client.patch(f"/api/v1/services/{service['id']}", json={"duration_min": "3 days"}, headers=tolu)
+    assert edited.json()["duration"] == "3 days"
+    bad = client.patch(f"/api/v1/services/{service['id']}", json={"duration_min": "soon"}, headers=tolu)
+    assert bad.status_code == 422
+
+    day = (datetime.now(LAGOS) + timedelta(days=1)).date()
+    day += timedelta(days=(day.weekday() == 6))
+    slots = call_tool(
+        client, "customer", "check_availability",
+        {"slug": "glam-by-tolu", "service_id": service["id"], "date": day.isoformat()},
+    )
+    assert slots["free_start_times"] and "3 days" in slots["note"]
 
 
 def test_wrong_password(client: TestClient) -> None:

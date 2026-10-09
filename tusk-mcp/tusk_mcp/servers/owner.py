@@ -74,10 +74,11 @@ def list_customers(
 def update_service(
     service_id: Annotated[int, Field(description="Service id")],
     price_naira: Annotated[int | None, Field(description="New price in Naira", gt=0)] = None,
-    duration_min: Annotated[int | None, Field(description="New duration in minutes", gt=0)] = None,
+    duration: Annotated[str | None, Field(description="New duration, e.g. '90 mins', '3 days', '1 week'")] = None,
     is_published: Annotated[bool | None, Field(description="Show or hide from customers")] = None,
 ) -> dict[str, Any]:
     """Change a service's price, duration or visibility."""
+    duration_min = biz.parse_duration(duration) if duration else None
     with session_scope() as session:
         service = biz.update_service(
             session,
