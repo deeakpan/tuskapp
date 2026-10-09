@@ -139,8 +139,9 @@ def whatsapp_link(phone: str, text: str = "") -> str | None:
 
 
 def keywords(text: str) -> set[str]:
+    """Letters and digits split apart, so owners' "13pro" or "128GB" match a customer's "13 Pro" or "128 gb"."""
     words = set()
-    for word in re.findall(r"[a-z0-9]+", text.lower()):
+    for word in re.findall(r"[a-z]+|[0-9]+", text.lower()):
         if word in _STOPWORDS or len(word) < 2:
             continue
         words.add(_singular(word))

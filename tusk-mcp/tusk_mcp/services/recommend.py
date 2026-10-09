@@ -77,20 +77,21 @@ def _next_free(session: Session, business: Business, service: Service, day: date
     return None
 
 
-def _in_category(business: Business, category: str) -> bool:
-    """Loose match, so 'hair salon' or 'phone shop' finds a business filed under 'salon' or 'phones'."""
-    return bool(keywords(category) & keywords(f"{business.category} {business.name}"))
+def _in_category(business: Business, services: list[Service], category: str) -> bool:
+    """Loose match, so 'phone shop' finds a business filed under 'phones', or a 'Gadgets Store' that sells phones."""
+    offered = " ".join(s.name for s in services)
+    return bool(keywords(category) & keywords(f"{business.category} {business.name} {business.about} {offered}"))
 
 
 def _candidate(
     session: Session, business: Business, prefs: Preferences, words: set[str], origin: geo.Point | None
 ) -> Option | None:
-    if prefs.category and not _in_category(business, prefs.category):
-        return None
     if prefs.home_service and not business.home_service:
         return None
     services = list_services(session, business)
     if not services:
+        return None
+    if prefs.category and not _in_category(business, services, prefs.category):
         return None
     fit = 1.0
     if words:
@@ -270,4 +271,10 @@ def recommend(session: Session, prefs: Preferences) -> dict[str, Any]:
         "options": [option_view(o, prefs) for o in options],
         "ranked_by": prefs.priority,
         "notes": notes,
+        "next_step": (
+            "Offer one next step: prices and photos (list_services), a free time (check_availability) or "
+            "holding one (create_booking). For follow-ups, call find_businesses again with the narrower need."
+            if options
+            else None
+        ),
     }
