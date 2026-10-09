@@ -222,7 +222,9 @@ def install(app: FastAPI) -> None:
         AnyHttpUrl(OWNER_MCP_URL), [issuer], scopes_supported=[OWNER_SCOPE], resource_name="TuskApp Owner"
     )
     app.router.routes.extend(resource_routes)
-    # Some clients look the document up without the trailing slash, or at the root.
+    # Some clients look the document up without the trailing slash. Nothing at the bare root: the customer
+    # MCP needs no sign-in, and clients fall back to the root document when checking it.
     metadata = resource_routes[0]
-    for path in ("/.well-known/oauth-protected-resource/mcp/owner", "/.well-known/oauth-protected-resource"):
-        app.router.routes.append(Route(path, endpoint=metadata.endpoint, methods=["GET", "OPTIONS"]))
+    app.router.routes.append(
+        Route("/.well-known/oauth-protected-resource/mcp/owner", endpoint=metadata.endpoint, methods=["GET", "OPTIONS"])
+    )
