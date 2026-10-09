@@ -5,7 +5,7 @@ import { logout } from "@/app/actions/auth";
 import { AutoRefresh, CopyButton } from "@/components/client";
 import { Wordmark } from "@/components/logo";
 import { Notifications } from "@/components/notifications";
-import { MobileNav, Sidebar } from "@/components/sidebar";
+import { MobileNav, RailCopyLink, Sidebar } from "@/components/sidebar";
 import { Avatar, Skeleton } from "@/components/ui";
 import { getMe } from "@/lib/data";
 
@@ -40,6 +40,11 @@ async function AccountActions() {
   );
 }
 
+async function SidebarChatLink() {
+  const { business } = await getMe();
+  return <RailCopyLink value={business.customer_mcp_url} />;
+}
+
 async function StatusLink() {
   const { business } = await getMe();
   return <span className="num truncate text-muted">{business.customer_mcp_url}</span>;
@@ -68,7 +73,13 @@ function SearchBox({ className }: { className?: string }) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <Sidebar
+        footer={
+          <Suspense fallback={<Skeleton className="h-14 w-full rounded-xl bg-white/5" />}>
+            <SidebarChatLink />
+          </Suspense>
+        }
+      />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
           <div className="flex h-14 items-center gap-3 px-4 sm:h-16 sm:gap-6 sm:px-6">

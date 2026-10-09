@@ -1,9 +1,9 @@
 "use client";
 
-import { CalendarCheck2, LayoutGrid, MessageCircleQuestion, Settings2, Tags, Users } from "lucide-react";
+import { CalendarCheck2, Check, LayoutGrid, Link2, MessageCircleQuestion, Settings2, Tags, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense } from "react";
+import { type ReactNode, Suspense, useState } from "react";
 import { TuskMark } from "./logo";
 import { cx } from "./ui";
 
@@ -48,8 +48,35 @@ function ActiveRailLinks() {
   return <RailLinks pathname={usePathname()} />;
 }
 
+/** Copies the business's customer MCP URL, the link owners paste into ChatGPT or Claude as a connector. */
+export function RailCopyLink({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      title={value}
+      onClick={async () => {
+        await navigator.clipboard.writeText(value);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1600);
+      }}
+      className="flex h-14 w-full items-center gap-3 overflow-hidden rounded-xl border border-white/10 px-[13px] text-left whitespace-nowrap text-ink-2/75 transition-colors hover:bg-white/5 hover:text-ink"
+    >
+      {copied ? (
+        <Check className="size-[18px] shrink-0 text-mint" strokeWidth={1.8} aria-hidden />
+      ) : (
+        <Link2 className="size-[18px] shrink-0" strokeWidth={1.8} aria-hidden />
+      )}
+      <span className="min-w-0 leading-tight opacity-0 transition-opacity duration-150 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100">
+        <span className="block text-[14px] font-strong text-ink">{copied ? "Copied" : "Copy chat link"}</span>
+        <span className="num block truncate text-[11px] text-muted">{value.replace(/^https?:\/\//, "")}</span>
+      </span>
+    </button>
+  );
+}
+
 /** Icon rail that widens over the page on hover or keyboard focus. */
-export function Sidebar() {
+export function Sidebar({ footer }: { footer?: ReactNode }) {
   return (
     <div className="hidden w-[68px] shrink-0 md:block">
       <aside className="group/rail fixed inset-y-0 left-0 z-40 flex w-[68px] flex-col gap-1 overflow-hidden border-r border-forest-2 bg-gradient-to-b from-forest-2 to-forest px-2.5 py-4 transition-[width,box-shadow] duration-200 ease-out hover:w-60 hover:shadow-[12px_0_40px_rgba(0,0,0,0.45)] focus-within:w-60">
@@ -68,6 +95,7 @@ export function Sidebar() {
             <ActiveRailLinks />
           </Suspense>
         </nav>
+        {footer && <div className="mt-auto pt-4">{footer}</div>}
       </aside>
     </div>
   );
