@@ -55,7 +55,7 @@ async function Greeting() {
       <Card className="mt-6 overflow-hidden">
         <div className="flex flex-col gap-3 bg-gradient-to-br from-forest-3 to-forest-2 p-5 sm:flex-row sm:items-center">
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-strong">Your customer chat link</p>
+            <p className="text-[13px] font-strong">Your customer MCP link</p>
             <code className="num mt-1 block truncate text-[12.5px] text-ink-2">{business.customer_mcp_url}</code>
           </div>
           <CopyButton value={business.customer_mcp_url} label="Copy link" variant="primary" />

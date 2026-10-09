@@ -116,7 +116,7 @@ async function Connect() {
       <Card className="overflow-hidden">
         <div className="bg-gradient-to-br from-forest-3 to-forest-2 px-5 py-5">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-strong">Customer chat link</span>
+            <span className="text-[15px] font-strong">Customer MCP link</span>
             <Tag>Share anywhere</Tag>
           </div>
           <p className="mt-1 text-[13px] text-ink-2/80">

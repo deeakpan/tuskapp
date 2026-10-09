@@ -68,7 +68,7 @@ export function RailCopyLink({ value }: { value: string }) {
         <Link2 className="size-[18px] shrink-0" strokeWidth={1.8} aria-hidden />
       )}
       <span className="min-w-0 leading-tight opacity-0 transition-opacity duration-150 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100">
-        <span className="block text-[14px] font-strong text-ink">{copied ? "Copied" : "Copy chat link"}</span>
+        <span className="block text-[14px] font-strong text-ink">{copied ? "Copied" : "Copy MCP link"}</span>
         <span className="num block truncate text-[11px] text-muted">{value.replace(/^https?:\/\//, "")}</span>
       </span>
     </button>

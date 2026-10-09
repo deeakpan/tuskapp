@@ -18,7 +18,7 @@ async function AccountActions() {
   return (
     <div className="flex items-center gap-2 sm:gap-3">
       <span className="hidden sm:block">
-        <CopyButton value={business.customer_mcp_url} label="Copy chat link" variant="primary" />
+        <CopyButton value={business.customer_mcp_url} label="Copy MCP link" variant="primary" />
       </span>
       <div className="flex items-center gap-2.5 rounded-full border border-line bg-panel py-1 pr-1 pl-1">
         <Avatar name={business.name} className="size-7 rounded-full text-[10px]" />
