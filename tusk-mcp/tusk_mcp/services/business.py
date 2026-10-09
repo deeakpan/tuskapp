@@ -65,7 +65,7 @@ CUSTOMER_EMAIL_DOMAIN = "customers.tuskapp.app"
 FIRST_REF = 412
 # Top-level paths the website uses itself, so no business profile can take them.
 RESERVED_SLUGS = {
-    "about", "admin", "api", "apple-icon", "auth", "b", "bookings", "customers", "help", "icon", "login",
+    "about", "admin", "api", "apple-icon", "auth", "b", "bookings", "connect", "customers", "help", "icon", "login",
     "mcp", "opengraph-image", "pay", "privacy", "questions", "robots", "services", "settings", "signup",
     "sitemap", "support", "terms", "twitter-image", "welcome",
 }

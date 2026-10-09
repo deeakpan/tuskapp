@@ -15,6 +15,14 @@ function Mark({ path, label, className }: { path: string; label: string; classNa
   );
 }
 
+export function ChatGPTLogo({ className }: { className?: string }) {
+  return <Mark path={OPENAI_PATH} label="ChatGPT" className={cx("text-ink", className)} />;
+}
+
+export function ClaudeLogo({ className }: { className?: string }) {
+  return <Mark path={CLAUDE_PATH} label="Claude" className={cx("text-[#d97757]", className)} />;
+}
+
 /** ChatGPT and Claude logos, bare and slightly overlapping, sized to sit inside a line of text. */
 export function AiLogos({ className }: { className?: string }) {
   return (

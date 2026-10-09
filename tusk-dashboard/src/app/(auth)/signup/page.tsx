@@ -17,7 +17,7 @@ export default function SignupPage() {
       <SignupForm />
       <p className="mt-6 text-sm text-muted">
         Already on TuskApp?{" "}
-        <Link href="/login" className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+        <Link href="/login?as=business" className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
           Log in
         </Link>
       </p>
