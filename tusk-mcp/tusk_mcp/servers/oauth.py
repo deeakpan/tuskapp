@@ -26,7 +26,7 @@ from mcp.shared.auth import OAuthClientInformationFull, OAuthToken
 from msflib.core.security import verify_password
 from pydantic import AnyHttpUrl
 from sqlmodel import select
-from starlette.routing import Route
+from starlette.routing import Mount, Route
 
 from tusk_mcp.actions import account_action
 from tusk_mcp.api.deps import get_keystore
@@ -38,6 +38,8 @@ from tusk_mcp.services.tokens import issue_mcp_token, revoke_mcp_token, verify_o
 
 OWNER_SCOPE = "owner"
 OWNER_MCP_URL = f"{settings.PUBLIC_BASE_URL}/mcp/owner/"
+ISSUER_PATH = "/oauth"
+ISSUER_URL = f"{settings.PUBLIC_BASE_URL}{ISSUER_PATH}"
 LOGIN_SECONDS = 15 * 60
 CODE_SECONDS = 5 * 60
 
@@ -205,19 +207,30 @@ async def login_submit(
 
 
 def install(app: FastAPI) -> None:
-    """Adds the OAuth endpoints (/authorize, /token, /register, /revoke) and their discovery documents."""
-    issuer = AnyHttpUrl(settings.PUBLIC_BASE_URL)
+    """Adds the OAuth endpoints (/oauth/authorize, /token, /register, /revoke) and their discovery documents.
+
+    Everything lives under /oauth, never at the root: chat apps that find an authorization server at
+    /.well-known/oauth-authorization-server ask for sign-in on every MCP on the host, including the
+    customer MCP, which is open to anyone."""
     app.include_router(router)
-    app.router.routes.extend(
-        create_auth_routes(
-            provider,
-            issuer,
-            client_registration_options=ClientRegistrationOptions(
-                enabled=True, valid_scopes=[OWNER_SCOPE], default_scopes=[OWNER_SCOPE]
-            ),
-            revocation_options=RevocationOptions(enabled=True),
+    auth_routes = create_auth_routes(
+        provider,
+        AnyHttpUrl(ISSUER_URL),
+        client_registration_options=ClientRegistrationOptions(
+            enabled=True, valid_scopes=[OWNER_SCOPE], default_scopes=[OWNER_SCOPE]
+        ),
+        revocation_options=RevocationOptions(enabled=True),
+    )
+    app.router.routes.append(Mount(ISSUER_PATH, routes=auth_routes))
+    server_metadata = next(r for r in auth_routes if r.path == "/.well-known/oauth-authorization-server")
+    app.router.routes.append(
+        Route(
+            f"/.well-known/oauth-authorization-server{ISSUER_PATH}",
+            endpoint=server_metadata.endpoint,
+            methods=["GET", "OPTIONS"],
         )
     )
+    issuer = AnyHttpUrl(ISSUER_URL)
     resource_routes = create_protected_resource_routes(
         AnyHttpUrl(OWNER_MCP_URL), [issuer], scopes_supported=[OWNER_SCOPE], resource_name="TuskApp Owner"
     )

@@ -25,6 +25,19 @@ def test_mcp_links_work_without_trailing_slash(client: TestClient) -> None:
     assert client.post("/mcp/owner", json=init, headers=headers, follow_redirects=False).status_code == 401
 
 
+def test_customer_mcp_advertises_no_sign_in(client: TestClient) -> None:
+    for path in (
+        "/.well-known/oauth-authorization-server",
+        "/.well-known/oauth-protected-resource",
+        "/.well-known/oauth-protected-resource/mcp/customer/",
+        "/.well-known/openid-configuration",
+        "/authorize",
+        "/register",
+        "/token",
+    ):
+        assert client.get(path).status_code == 404, path
+
+
 def test_owner_connects_by_signing_in(client: TestClient, tolu: dict[str, str]) -> None:
     challenge = client.post("/mcp/owner/", json={}, headers={"Accept": "application/json, text/event-stream"})
     assert challenge.status_code == 401
@@ -32,11 +45,13 @@ def test_owner_connects_by_signing_in(client: TestClient, tolu: dict[str, str]) 
 
     resource = client.get("/.well-known/oauth-protected-resource/mcp/owner/").json()
     assert resource["resource"] == "http://localhost/mcp/owner/"
-    server = client.get("/.well-known/oauth-authorization-server").json()
-    assert server["registration_endpoint"] == "http://localhost/register"
+    assert resource["authorization_servers"] == ["http://localhost/oauth"]
+    server = client.get("/.well-known/oauth-authorization-server/oauth").json()
+    assert server["registration_endpoint"] == "http://localhost/oauth/register"
+    assert client.get("/oauth/.well-known/oauth-authorization-server").status_code == 200
 
     registered = client.post(
-        "/register",
+        "/oauth/register",
         json={
             "redirect_uris": [REDIRECT],
             "client_name": "Claude",
@@ -51,7 +66,7 @@ def test_owner_connects_by_signing_in(client: TestClient, tolu: dict[str, str]) 
     verifier = secrets.token_urlsafe(48)
     code_challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b"=").decode()
     authorize = client.get(
-        "/authorize",
+        "/oauth/authorize",
         params={
             "response_type": "code",
             "client_id": client_id,
@@ -86,7 +101,7 @@ def test_owner_connects_by_signing_in(client: TestClient, tolu: dict[str, str]) 
     assert query["state"] == ["abc"]
 
     token = client.post(
-        "/token",
+        "/oauth/token",
         data={
             "grant_type": "authorization_code",
             "code": query["code"][0],
@@ -103,7 +118,7 @@ def test_owner_connects_by_signing_in(client: TestClient, tolu: dict[str, str]) 
     connected = next(t for t in tokens if t["name"] == "Claude (signed in)")
 
     reused = client.post(
-        "/token",
+        "/oauth/token",
         data={"grant_type": "authorization_code", "code": query["code"][0], "redirect_uri": REDIRECT,
               "client_id": client_id, "code_verifier": verifier},
     )
