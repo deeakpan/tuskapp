@@ -252,6 +252,7 @@ async function BusinessForms() {
             <Field label="Description" hint="Plain sentences work best. Don’t list prices here — chat takes those from Services.">
               <CountedTextarea
                 name="about"
+                saveOnBlur
                 rows={6}
                 maxLength={ABOUT_MAX}
                 defaultValue={business.about}

@@ -110,20 +110,34 @@ export function CountedTextarea({
   maxLength,
   defaultValue = "",
   className,
+  saveOnBlur = false,
   ...props
-}: ComponentProps<"textarea"> & { maxLength: number; defaultValue?: string }) {
-  const [length, setLength] = useState(defaultValue.length);
+}: ComponentProps<"textarea"> & { maxLength: number; defaultValue?: string; saveOnBlur?: boolean }) {
+  const [value, setValue] = useState(defaultValue);
+  const unsaved = saveOnBlur && value !== defaultValue;
+
+  useEffect(() => {
+    if (!unsaved) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [unsaved]);
+
   return (
     <div className="relative">
       <textarea
         {...props}
         maxLength={maxLength}
         defaultValue={defaultValue}
-        onChange={(event) => setLength(event.target.value.length)}
+        onChange={(event) => setValue(event.target.value)}
+        onBlur={(event) => {
+          if (unsaved) event.currentTarget.form?.requestSubmit();
+        }}
         className={cx(className, "pb-7")}
       />
       <span className="num pointer-events-none absolute right-3 bottom-2 text-[11px] text-faint" aria-hidden>
-        {length}/{maxLength}
+        {unsaved && <span className="text-amber">Not saved · </span>}
+        {value.length}/{maxLength}
       </span>
     </div>
   );
