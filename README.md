@@ -18,12 +18,14 @@ There are two links. Use the customer one to try it out.
 
 ### ChatGPT
 
-1. Open **Settings → Apps & Connectors → Advanced settings** and turn on **Developer mode**.
-2. Back in **Apps & Connectors**, click **Create**.
-3. Give it a name (TuskApp) and paste the link into **Server URL**.
-4. Set **Authentication** to **No authentication** for the customer link, or **OAuth** for the owner link.
+1. Open **Settings → Security and login** and turn on **Developer mode**.
+2. Open **Plugins** in the sidebar, click **+** next to the search box and choose **Add custom MCP server**.
+3. Name it TuskApp and paste the link as the **Server URL**.
+4. Set **Authentication** to **No Auth** for the customer link, or **OAuth** for the owner link.
 5. Tick **I understand and want to continue**, then **Create**.
-6. In a new chat, click **+ → More → TuskApp** to switch it on for that chat. Turn off web search, or ChatGPT may search the web instead.
+6. In a new chat, click **+** in the message box and choose **TuskApp**. Leave web search off, or ChatGPT may search the web instead.
+
+Screenshots of each step are on the dashboard at `/connect`.
 
 ### Claude
 

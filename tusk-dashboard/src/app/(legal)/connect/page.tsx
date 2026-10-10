@@ -28,29 +28,45 @@ const STEPS: Record<AppKey, Step[]> = {
       title: "Turn on Developer mode",
       body: (
         <>
-          Open <b>Settings → Apps & Connectors → Advanced settings</b> and switch on <b>Developer mode</b>.
+          Open <b>Settings → Security and login</b>, scroll to <b>Developer mode</b> and switch it on.
         </>
       ),
+      shot: { src: "/connect/chatgpt-developer-mode.png", width: 1024, height: 476, alt: "ChatGPT settings, Security and login, with Developer mode switched on" },
     },
     {
-      title: "Create the TuskApp connector",
+      title: "Add a custom MCP server",
       body: (
         <>
-          In <b>Apps & Connectors</b>, click <b>Create</b>. Name it TuskApp and paste the link above as the{" "}
-          <b>Server URL</b>. Set <b>Authentication</b> to <b>No authentication</b>, tick{" "}
-          <b>I understand and want to continue</b>, then click <b>Create</b>.
+          Open <b>Plugins</b> in the sidebar, click <b>+</b> next to the search box and choose{" "}
+          <b>Add custom MCP server</b>.
         </>
       ),
-      shot: { src: "/connect/chatgpt-create.png", width: 810, height: 112, alt: "ChatGPT's Create connector form with the TuskApp link pasted as the Server URL" },
+      shot: { src: "/connect/chatgpt-add-mcp.png", width: 658, height: 373, alt: "The Plugins + menu with Add custom MCP server" },
     },
     {
-      title: "Switch it on in a chat",
+      title: "Fill in TuskApp",
       body: (
         <>
-          Start a new chat, click <b>+ → More → TuskApp</b>. Leave <b>Web search</b> off so ChatGPT answers from
-          TuskApp. It stays on for the whole chat.
+          Name it TuskApp, paste the link above as the <b>Server URL</b>, set <b>Authentication</b> to{" "}
+          <b>No Auth</b>, tick <b>I understand and want to continue</b> and click <b>Create</b>.
         </>
       ),
+      shot: { src: "/connect/chatgpt-new-plugin.png", width: 1024, height: 766, alt: "ChatGPT's New Plugin form filled in with the TuskApp link and No Auth" },
+    },
+    {
+      title: "You’re connected",
+      body: <>ChatGPT confirms TuskApp is connected. Leave the permissions on the default.</>,
+      shot: { src: "/connect/chatgpt-connected.png", width: 1024, height: 725, alt: "ChatGPT showing Tusk app is now connected" },
+    },
+    {
+      title: "Pick TuskApp in a chat",
+      body: (
+        <>
+          In a new chat, click <b>+</b> in the message box and choose <b>TuskApp</b>. It shows as a blue tag in your
+          message. Leave <b>Web search</b> off so ChatGPT answers from TuskApp.
+        </>
+      ),
+      shot: { src: "/connect/chatgpt-use-in-chat.png", width: 1024, height: 574, alt: "A ChatGPT message with the TuskApp tag selected, asking for furniture" },
     },
   ],
   claude: [
@@ -172,6 +188,7 @@ async function Guide({ searchParams }: { searchParams: PageProps<"/connect">["se
                     height={step.shot.height}
                     alt={step.shot.alt}
                     sizes="(min-width: 768px) 640px, 100vw"
+                    loading={i === 0 ? "eager" : "lazy"}
                     className="h-auto w-full"
                   />
                   <figcaption className="border-t border-line px-3 py-1.5 text-xs text-faint">In {name}</figcaption>

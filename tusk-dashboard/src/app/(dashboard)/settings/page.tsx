@@ -39,11 +39,11 @@ const MCP_SETUP = [
   {
     app: "ChatGPT",
     steps: [
-      "Settings → Apps & Connectors → Advanced settings: turn on Developer mode.",
-      "Back in Apps & Connectors, click Create.",
-      "Name it TuskApp, paste your MCP link, choose OAuth, tick “I trust this application” and create it.",
+      "Settings → Security and login: turn on Developer mode.",
+      "Open Plugins in the sidebar, click + and choose Add custom MCP server.",
+      "Name it TuskApp, paste your MCP link, set Authentication to OAuth, tick “I understand and want to continue” and create it.",
       "Sign in with your TuskApp email and password.",
-      "In a new chat, pick TuskApp from the + menu and ask away.",
+      "In a new chat, click + in the message box, choose TuskApp and ask away.",
     ],
   },
   {
